@@ -1,25 +1,24 @@
 #include "partPath.h"
 
-//partPath::partPath(const std::string &part) : own_path(part), own_dir(), hand(nullptr)
 partPath::partPath(const std::string& part) : own_dir(part), hand(nullptr)
 {
-	std::replace(own_dir.begin(), own_dir.end(), '\\', '/');
+	std::replace(own_dir.begin(), own_dir.end(), '\\', '/');// для win
 	// тут ничего не надо
 }
 
 partPath::partPath(const std::string &part, partPath &handler) : own_dir(part), hand(&handler)
 {
-	std::replace(own_dir.begin(), own_dir.end(), '\\', '/');
+	std::replace(own_dir.begin(), own_dir.end(), '\\', '/');// для win
 	// и тут ничего не надо
 }
 
-partPath::partPath(checkDir::type_dir chek_type, partPath &handler) : hand(&handler)
+partPath::partPath(checkDir::type_dir check_type, partPath &handler) : check(check_type), hand(&handler)
 {
 	// прочитаем директорий
-	own_dir = frashFish(hand->getPath(), chek_type);
-	//own_dir = frashFish(hand->getDir(), chek_type);
+	//own_dir = frashFish(hand->getPath(), check_type);
+	// создать поток
+	reading();
 }
-
 
 partPath::~partPath()
 {
@@ -29,8 +28,6 @@ partPath::~partPath()
 
 std::string partPath::getPath()
 {
-	//return hand ? hand->getPath() + own_path + own_dir : own_path;
-	//std::string aaa = hand ? hand->getPath() + own_dir : own_dir;
 	return hand ? hand->getPath() + "/" + own_dir : own_dir;
 }
 
@@ -72,3 +69,62 @@ std::string partPath::frashFish(const std::string &path, checkDir::type_dir type
 	}
 	return std::string("");
 }
+
+/*
+void partPath::cycleThread(std::atomic<bool>& program_is_running)
+{
+	std::string found;
+	while (program_is_running)
+	{
+		found = frashFish(hand->getPath(), check);
+		if (found != own_dir) own_dir = found;
+		/// !!! TEST !!! ///
+		std::cout << hand->getPath() << "/" << own_dir << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		///////////////////
+	}
+}
+*/
+partPath* partPath::getHand()
+{
+	return hand;
+}
+checkDir::type_dir partPath::getCheck()
+{
+	return check;
+}
+void partPath::setDir(std::string str)
+{
+	if (str != own_dir) own_dir = str;
+	/// !!! TEST !!! ///
+	std::cout << hand->getPath() << "/" << own_dir << std::endl;
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	///////////////////
+}
+
+void cycleThread(std::atomic<bool>& program_is_running, partPath& pp)
+{
+	std::string found;
+	while (program_is_running)
+	{
+		found = pp.frashFish(pp.getHand()->getPath(), pp.getCheck());
+		//if (found != own_dir) own_dir = found;
+		pp.setDir(found);
+	}
+}
+
+void partPath::tcloser(std::thread* t)
+{
+	
+	t->join();
+	delete t;
+	//running = false;
+};
+
+void partPath::reading()
+{
+	running = true;
+	//t = new std::thread(cycleThread, std::ref(running), std::ref(*this));
+	std::unique_ptr<std::thread, tcloser> t(std::thread(cycleThread, std::ref(running), std::ref(*this)));
+}
+

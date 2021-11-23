@@ -60,5 +60,9 @@ int main()
 	partPath pp3("aaa", pp2);
 	partPath pp4(checkDir::month, pp3);
 
+	std::this_thread::sleep_for(std::chrono::seconds(3));
 	std::cout << pp4.getPath() << std::endl;
+	std::this_thread::sleep_for(std::chrono::seconds(10));
+	std::cout << "### END ###" << std::endl;
+
 }

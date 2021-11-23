@@ -1,8 +1,18 @@
 #pragma once
 
+// ƒЋя “≈—“ј, удалить!
+#include <iostream>
+//
+
 #include <string>
 #include <map>
 #include <regex>
+// дл€ потока
+#include <thread> 
+#include <chrono>
+#include <atomic>
+#include <memory>
+//
 #include "bricksAndMortar.h"
 
 //--------------------------------------------------------------------------//
@@ -33,10 +43,22 @@ public:
 	std::string getPath();
 	//std::string getDir();
 	//std::string getPath(partPath*);
+	partPath* getHand();
+	checkDir::type_dir getCheck();
+	//std::string getDir();
+	void setDir(std::string);
+
 
 private:
 	// вы€снить свой полный путь в конструкторе
 	//std::string own_path;
 	std::string own_dir;
 	partPath* hand;
+	checkDir::type_dir check;
+
+	std::atomic<bool> running;
+	//std::thread* t;
+	//void cycleThread(std::atomic<bool>& program_is_running);
+	void reading();
+	void tcloser(std::thread*);
 };

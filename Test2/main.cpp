@@ -23,6 +23,8 @@ void cycle_thread(int n, std::atomic<bool>& program_is_running)
 
 int main()
 {
+
+
 	std::atomic<bool> running{ true };
 
 	std::thread t(cycle_thread, 1, std::ref(running));
