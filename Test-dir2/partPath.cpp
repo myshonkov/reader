@@ -22,6 +22,9 @@ partPath::partPath(checkDir::type_dir check_type, partPath &handler) : check(che
 
 partPath::~partPath()
 {
+	t->join();
+	delete t;
+	running = false;
 }
 
 /* *** */
@@ -70,7 +73,7 @@ std::string partPath::frashFish(const std::string &path, checkDir::type_dir type
 	return std::string("");
 }
 
-/*
+
 void partPath::cycleThread(std::atomic<bool>& program_is_running)
 {
 	std::string found;
@@ -80,11 +83,12 @@ void partPath::cycleThread(std::atomic<bool>& program_is_running)
 		if (found != own_dir) own_dir = found;
 		/// !!! TEST !!! ///
 		std::cout << hand->getPath() << "/" << own_dir << std::endl;
-		std::this_thread::sleep_for(std::chrono::seconds(1));
 		///////////////////
+		std::this_thread::sleep_for(std::chrono::seconds(1));// время ожидания заменить переменной !!!
 	}
 }
-*/
+
+/*
 partPath* partPath::getHand()
 {
 	return hand;
@@ -118,13 +122,13 @@ void partPath::tcloser(std::thread* t)
 	
 	t->join();
 	delete t;
-	//running = false;
-};
-
+	running = false;
+}
+*/
 void partPath::reading()
 {
 	running = true;
-	//t = new std::thread(cycleThread, std::ref(running), std::ref(*this));
-	std::unique_ptr<std::thread, tcloser> t(std::thread(cycleThread, std::ref(running), std::ref(*this)));
+	//void(*fp)(std::thread*) = tcloser;
+	t = new std::thread(cycleThread, std::ref(running));
+	//std::unique_ptr<std::thread, decltype(&tcloser)> t(new std::thread(cycleThread, std::ref(running), std::ref(*this)));
 }
-

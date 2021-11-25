@@ -57,8 +57,8 @@ private:
 	checkDir::type_dir check;
 
 	std::atomic<bool> running;
-	//std::thread* t;
-	//void cycleThread(std::atomic<bool>& program_is_running);
+	std::thread* t;
+	void cycleThread(std::atomic<bool>& program_is_running);
 	void reading();
 	void tcloser(std::thread*);
 };
